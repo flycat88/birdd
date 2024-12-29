@@ -3,8 +3,58 @@
         Invoice List
     </h2>
 
+    <style>
+        /* Add your styling here */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .btn-edit, .btn-delete {
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            color: white;
+            margin-right: 5px;
+        }
+        .btn-edit {
+            background-color: #007bff;
+        }
+        .btn-edit:hover {
+            background-color: #0056b3;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+        }
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+    </style>
+
     <div class="container">
         <a href="{{ route('invoices.create') }}">
+
+
+
+
             <button class="add-button">Add New Invoice</button>
         </a>
 
@@ -21,6 +71,7 @@
                         <th>Total Amount</th>
                         <th>Paid Amount</th>
                         <th>Status</th>
+                        <th>Bill Amount</th> <!-- New column for Bill Amount -->
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -34,6 +85,7 @@
                             <td>{{ $invoice->total_amount }}</td>
                             <td>{{ $invoice->paid_amount }}</td>
                             <td>{{ ucfirst($invoice->status) }}</td>
+                            <td>{{ number_format($invoice->total_bill_amount, 2) }}</td> <!-- Displaying Bill Amount -->
                             <td>
                                 <a href="{{ route('invoices.edit', $invoice->id) }}" class="edit-button">Edit</a>
                                 <form action="{{ route('invoices.destroy', $invoice->id) }}" method="POST" style="display:inline;">
@@ -48,4 +100,5 @@
             </table>
         @endif
     </div>
+
 </x-app-layout>

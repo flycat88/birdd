@@ -19,15 +19,18 @@ return new class extends Migration
             $table->decimal('amount_paid', 10, 2); // Amount that has been paid
             $table->string('payment_method'); // Payment method (e.g., cash, credit card, bank transfer)
             $table->string('reference_number')->nullable(); // Optional reference number for the payment
-            
+
             // Foreign key constraint referencing the invoices table
             $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('cascade');
+
+
+
         });
     }
     /**
      * Reverse the migrations.
      */
-    public function down() 
+    public function down()
     {
         Schema::dropIfExists('receipts');
     }

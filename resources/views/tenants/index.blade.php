@@ -94,4 +94,5 @@
             </table>
         @endif
     </div>
+
 </x-app-layout>

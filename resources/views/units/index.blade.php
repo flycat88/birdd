@@ -1,6 +1,4 @@
 <x-app-layout>
-
-
     <style>
         body {
             background-color: #f8fafc; /* Light gray background */
@@ -45,11 +43,36 @@
         }
 
         tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
+            background-color: #f9f9f9;
+        }
 
         tr:hover {
             background-color: #f5f5f5; /* Light gray for row hover */
+        }
+
+        /* Button Styling for Delete */
+        .delete-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .delete-button:hover {
+            background-color: #c0392b;
+        }
+
+        /* Button Styling for Edit */
+        .edit-button {
+            color: #3498db;
+            text-decoration: none;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .edit-button:hover {
+            text-decoration: underline;
         }
     </style>
 
@@ -68,6 +91,9 @@
                         <th>ID</th>
                         <th>Name</th>
                         <th>Property Name</th>
+                        <th>Occupancy Status</th>
+                        <th>Tenant</th>
+                        <th>Actions</th> <!-- Added actions column -->
                     </tr>
                 </thead>
                 <tbody>
@@ -75,7 +101,36 @@
                         <tr>
                             <td>{{ $unit->id }}</td>
                             <td>{{ $unit->name }}</td>
-                            <td>{{ $unit->property->name ?? 'N/A' }}</td>
+                            <td>{{ $unit->property->name  }}</td>
+
+                            <!-- Display occupancy status with tenant details if occupied -->
+                            <td>
+                                @if($unit->tenant_id) <!-- If tenant_id is set, it's occupied -->
+                                Occupied
+                            @else
+                                Vacant
+                            @endif
+                            </td>
+
+                            <td>
+                                <!-- Display tenant name if available -->
+                                @if ($unit->tenant)
+                                    <span>{{ $unit->tenant->name }}</span>
+                                @else
+                                    <span>-</span>
+                                @endif
+                            </td>
+
+                            <td>
+                                <a href="{{ route('units.edit', $unit->id) }}" class="edit-button">Edit</a>
+                                
+                                <!-- Delete Form -->
+                                <form action="{{ route('units.destroy', $unit->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="delete-button" onclick="return confirm('Are you sure you want to delete this unit?')">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

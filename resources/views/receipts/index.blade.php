@@ -28,7 +28,8 @@
                     @foreach ($receipts as $receipt)
                         <tr>
                             <td>{{ $receipt->id }}</td>
-                            <td>{{ $receipt->tenant->name ?? 'N/A' }}</td>
+                            <td>{{ $receipt->tenant->name ?? 'NA' }}</td>
+
                             <td>{{ $receipt->invoice->invoice_number ?? 'N/A' }}</td>
                             <td>{{ $receipt->receipt_date->format('Y-m-d') }}</td>
                             <td>{{ $receipt->amount_paid }}</td>

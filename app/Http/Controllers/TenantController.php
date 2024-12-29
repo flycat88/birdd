@@ -25,27 +25,37 @@ class TenantController extends Controller
     public function create()
     {
         $properties = Property::all(); // Fetch all properties
-        $units = Unit::all(); // Retrieve all units
-
+        $units = Unit::whereNull('tenant_id')->get();
         return view('tenants.create', compact('properties', 'units')); // Pass both to the view
     }
-
     public function store(Request $request)
     {
+        // Validate the incoming request data
         $request->validate([
             'name' => 'required|string|max:255',
             'rent' => 'required|numeric',
-            'balance' => 'numeric|nullable',
+            'balance' => 'nullable|numeric',
             'phone_number' => 'required|string|max:15',
-            'unit_id' => 'required|exists:units,id', // Validate the unit_id
+            'unit_id' => 'required|exists:units,id', // Ensure the unit exists
         ]);
-
-        Tenant::create($request->only(['name', 'rent', 'balance', 'phone_number', 'unit_id']));
-
-        return redirect()->route('tenants.index')->with('success', 'Tenant added successfully.');
+    
+        // Create the tenant
+        $tenant = Tenant::create($request->only(['name', 'rent', 'balance', 'phone_number', 'unit_id']));
+    
+        // Now, update the unit's tenant_id and occupancy_status
+        $unit = Unit::find($request->unit_id); // Find the unit by unit_id
+        if ($unit) {
+            $unit->tenant_id = $tenant->id; // Set the tenant_id on the unit
+            $unit->occupancy_status = 1; // Mark it as occupied
+            $unit->save(); // Save the updated unit
+        }
+    
+        // Redirect to the tenant list or another page
+        return redirect()->route('tenants.index')->with('success', 'Tenant added and unit marked as occupied.');
     }
-
-
+    
+    
+    
 
     public function update(Request $request, $id)
 {
@@ -91,6 +101,10 @@ public function edit($id)
     public function destroy($id)
     {
         $tenant = Tenant::findOrFail($id);
+
+        $unit = $tenant->unit; // Assuming Tenant has a 'unit' relationship
+        $unit->occupancy_status = false; // Set occupancy status back to vacant
+        $unit->save(); // Save the updated unit
         $tenant->delete();
 
         return redirect()->route('tenants.index')->with('success', 'Tenant deleted successfully');
@@ -133,5 +147,18 @@ public function edit($id)
     {
         return $this->balance; // Adjust if needed for any additional calculations
     }
+
+    public function getVacantUnits($propertyId)
+{
+    // Fetch only vacant units for the selected property (tenant_id is null)
+    $units = Unit::where('property_id', $propertyId)
+                 ->whereNull('tenant_id')  // Only fetch units that have no tenant assigned
+                 ->get();
+
+    // Return the units as a JSON response
+    return response()->json($units);
+}
+
+
 
 }

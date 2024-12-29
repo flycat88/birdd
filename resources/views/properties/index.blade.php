@@ -69,6 +69,15 @@
                             <td>{{ $property->id }}</td>
                             <td>{{ $property->name }}</td>
                             <td>{{ $property->location }}</td>
+
+                            <td>
+                                <a href="{{ route('properties.edit', $property->id) }}">Edit</a>
+                                <form action="{{ route('properties.destroy', $property->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+                                </form>
+                            </td>
                         </tr>
                     @endforeach
                 </tbody>

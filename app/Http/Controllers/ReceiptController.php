@@ -6,6 +6,7 @@ use App\Models\Receipt;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 use App\Models\Balance;
+use App\Models\Tenant;
 
 
 class ReceiptController extends Controller
@@ -27,8 +28,9 @@ class ReceiptController extends Controller
 
     public function create()
     {
-        $invoices = Invoice::all(); // Fetch all invoices for the dropdown
-        return view('receipts.create', compact('invoices'));
+        $invoices = Invoice::all();
+    $tenants = Tenant::all(); // Pass tenants to the view
+    return view('receipts.create', compact('invoices', 'tenants'));
     }
 
     // Store a new receipt
@@ -39,14 +41,17 @@ class ReceiptController extends Controller
 {
     $request->validate([
         'invoice_id' => 'required|exists:invoices,id',
+        'tenant_id' => 'required|exists:tenants,id',
         'receipt_date' => 'required|date',
         'amount_paid' => 'required|numeric|min:0',
         'payment_method' => 'required|string',
+        'tenant_id' => 'required|exists:tenants,id',
     ]);
 
     // Create the receipt
     $receipt = Receipt::create([
         'invoice_id' => $request->invoice_id,
+        'tenant_id' => $request->tenant_id,
         'receipt_date' => $request->receipt_date,
         'amount_paid' => $request->amount_paid,
         'payment_method' => $request->payment_method,

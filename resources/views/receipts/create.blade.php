@@ -1,4 +1,4 @@
-<x-app-layout>
+
     <style>
         /* Styling for the main content area */
         .content-area {
@@ -66,6 +66,14 @@
                 @endforeach
             </select>
 
+            <label for="tenant_id">Tenant:</label>
+<select name="tenant_id" required>
+    @foreach($tenants as $tenant)
+        <option value="{{ $tenant->id }}">{{ $tenant->name }}</option>
+    @endforeach
+</select>
+
+
             <label for="receipt_date">Receipt Date:</label>
             <input type="date" name="receipt_date" required>
 
@@ -81,4 +89,3 @@
             <button type="submit">Add Receipt</button>
         </form>
     </div>
-</x-app-layout>

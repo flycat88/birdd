@@ -12,7 +12,7 @@ class Receipt extends Model
     use HasFactory;
 
     protected $fillable = [
-        'invoice_id', 'receipt_date', 'amount_paid', 'payment_method', 'reference_number'
+        'invoice_id','tenant_id',  'receipt_date', 'amount_paid', 'payment_method', 'reference_number'
     ];
     protected $casts = [
         'receipt_date' => 'datetime', // Cast receipt_date to a Carbon instance

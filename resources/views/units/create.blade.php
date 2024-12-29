@@ -1,4 +1,4 @@
-<x-app-layout>
+
     <head>
         <style>
             body {
@@ -105,5 +105,5 @@
             <button type="submit">Add Unit</button>
             <a href="{{ route('units.index') }}">Back to units List</a>
         </form>
+        
     </div>
-</x-app-layout>

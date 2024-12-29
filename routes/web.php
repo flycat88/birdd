@@ -8,16 +8,27 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\BalanceController;
 use App\Http\Controllers\ReceiptController;
+use App\Http\Controllers\BillController;
+use App\Http\Controllers\Auth\LoginController;
+
+use App\Http\Controllers\DashboardController;
+
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/login'); // Redirect to login
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/', function () {
 
-Route::middleware('auth')->group(function () {
+
+    return redirect('/dashboard');
+    // return view('welcome');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Dashboard route: Use the DashboardController
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -47,8 +58,10 @@ Route::get('/tenants/{id}/edit', [TenantController::class, 'edit'])->name('tenan
 // Route::get('/tenants/{id}/edit', [TenantController::class, 'edit'])->name('tenants.edit');
 
 Route::resource('invoices', InvoiceController::class);
-Route::get('invoices/{id}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
-Route::resource('invoices', InvoiceController::class);
+// Route::get('invoices/{id}/edit', [InvoiceController::class, 'edit'])->name('invoices.edit');
+Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+
+
 // Display balances
 Route::get('/balances', [BalanceController::class, 'index'])->name('balances.index');
 
@@ -57,6 +70,25 @@ Route::get('/balances/calculate', [BalanceController::class, 'calculateBalances'
 Route::get('/balances', [BalanceController::class, 'index'])->name('balances.index');
 Route::resource('receipts', ReceiptController::class);
 Route::resource('receipts', ReceiptController::class);
+Route::resource('units', UnitController::class);
+Route::resource('properties', PropertyController::class);
+
+
+Route::get('/bills/create', [BillController::class, 'create'])->name('bills.create');
+Route::post('/bills', [BillController::class, 'store'])->name('bills.store');
+Route::get('/invoices/{id}', [InvoicesController::class, 'show'])->name('invoices.show');
+
+
+Route::get('invoices/{tenant_id}/add-bill', [InvoiceController::class, 'addBill'])->name('invoices.addBill');
+Route::post('invoices/{tenant_id}/store-bill', [InvoiceController::class, 'storeBill'])->name('invoices.storeBill');
+Route::post('/invoices/{tenant_id}/add-bill', [InvoiceController::class, 'storeBill'])->name('invoices.storeBill');
+
+Route::get('invoices/{tenant_id}/add-bill', [InvoiceController::class, 'addBill'])->name('invoices.addBill');
+Route::get('/dashboard', [UnitController::class, 'dashboard'])->name('dashboard');
+
+// Route for AJAX request to fetch occupancy data (if needed)
+Route::get('/occupancy-data', [UnitController::class, 'getOccupancyData']);
+Route::get('/properties/{propertyId}/vacant-units', [TenantController::class, 'getVacantUnits']);
 
 });
 

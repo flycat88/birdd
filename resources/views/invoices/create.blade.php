@@ -64,56 +64,113 @@
             background-color: #0056b3;
         }
 
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 100%;
+            text-decoration: none;
+        }
+
+        .btn-primary:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
     </style>
 
-    <div class="container">
+ <div class="container">
         <form action="{{ route('invoices.store') }}" method="POST">
             @csrf
 
+            <!-- Tenant Selection -->
             <div class="form-group">
                 <label for="tenant_id">Tenant:</label>
-                <select name="tenant_id" required>
+                <select name="tenant_id" id="tenant_id" required onchange="updateInvoiceAmount()">
+                    <option value="">-- Select Tenant --</option>
                     @foreach($tenants as $tenant)
-                        <option value="{{ $tenant->id }}">{{ $tenant->name }}</option>
+                        <option value="{{ $tenant->id }}"
+                                data-rent="{{ $tenant->rent }}"
+                                data-balance="{{ $tenant->balance }}"
+                                {{ old('tenant_id', session('tenant_id')) == $tenant->id ? 'selected' : '' }}>
+                            {{ $tenant->name }}
+                        </option>
                     @endforeach
                 </select>
             </div>
 
-            {{-- <div class="form-group">
-                <label for="invoice_number">Invoice Number:</label>
-                <input type="text" name="invoice_number" required>
-            </div> --}}
-
+            <!-- Invoice Date -->
             <div class="form-group">
                 <label for="invoice_date">Invoice Date:</label>
-                <input type="date" name="invoice_date" required>
+                <input type="date" name="invoice_date" value="{{ old('invoice_date') }}" required>
             </div>
 
+            <!-- Due Date -->
             <div class="form-group">
                 <label for="due_date">Due Date:</label>
-                <input type="date" name="due_date" required>
+                <input type="date" name="due_date" value="{{ old('due_date') }}" required>
             </div>
 
+            <!-- Total Amount -->
             <div class="form-group">
                 <label for="total_amount">Total Amount:</label>
-                <input type="number" step="0.01" name="total_amount" required>
+                <input type="number" step="0.01" name="total_amount" id="total_amount" value="{{ old('total_amount', session('total_amount', 0)) }}" readonly>
             </div>
 
+            <!-- Paid Amount -->
             <div class="form-group">
-                <label for="paid_amount">Paid Amount (optional):</label>
-                <input type="number" step="0.01" name="paid_amount">
+                <label for="paid_amount">Paid Amount:</label>
+                <input type="number" step="0.01" name="paid_amount" id="paid_amount" value="{{ old('paid_amount') }}" readonly>
             </div>
 
+            <!-- Invoice Status -->
             <div class="form-group">
                 <label for="status">Status:</label>
                 <select name="status" required>
-                    <option value="pending">Pending</option>
-                    <option value="paid">Paid</option>
-                    <option value="canceled">Canceled</option>
+                    <option value="pending" {{ old('status', 'pending') == 'pending' ? 'selected' : '' }}>Pending</option>
+                    <option value="paid" {{ old('status') == 'paid' ? 'selected' : '' }}>Paid</option>
+                    <option value="canceled" {{ old('status') == 'canceled' ? 'selected' : '' }}>Canceled</option>
                 </select>
             </div>
 
+            <!-- Add Bill Button -->
+            <div class="form-group">
+                <a id="addBillLink" href="#" class="btn-primary disabled" disabled>
+                    Add Bill
+                </a>
+            </div>
+
+            <!-- Submit Button for Creating Invoice -->
             <button type="submit">Create Invoice</button>
         </form>
     </div>
+
+    <script>
+        function updateInvoiceAmount() {
+            const tenantSelect = document.getElementById('tenant_id');
+            const selectedOption = tenantSelect.options[tenantSelect.selectedIndex];
+            const tenantId = selectedOption.value;
+
+            // Get the rent value from the selected option's data-rent attribute
+            const rentAmount = selectedOption.getAttribute('data-rent');
+
+            // Set the total amount to the rent value
+            const totalAmountInput = document.getElementById('total_amount');
+            totalAmountInput.value = rentAmount;
+
+            // Enable the "Add Bill" link
+            const addBillLink = document.getElementById('addBillLink');
+            if (tenantId) {
+                addBillLink.href = `/invoices/${tenantId}/add-bill`;
+                addBillLink.classList.remove('disabled');
+                addBillLink.removeAttribute('disabled');
+            } else {
+                addBillLink.href = '#';
+                addBillLink.classList.add('disabled');
+                addBillLink.setAttribute('disabled', 'true');
+            }
+        }
+    </script>
 </x-app-layout>

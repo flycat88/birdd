@@ -43,6 +43,34 @@ class PropertyController extends Controller
 
     }
 
+    public function edit($id)
+{
+    $property = Property::findOrFail($id);
+    return view('properties.edit', compact('property'));
+}
+
+public function update(Request $request, $id)
+{
+    $property = Property::findOrFail($id);
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'address' => 'required|string|max:255',
+        'description' => 'nullable|string',
+    ]);
+
+    $property->update($request->all());
+
+    return redirect()->route('properties.index')->with('success', 'Property updated successfully');
+}
+public function destroy($id)
+{
+    $property = Property::findOrFail($id);
+    $property->delete();
+
+    return redirect()->route('properties.index')->with('success', 'Property deleted successfully');
+}
+
 
 
 }
